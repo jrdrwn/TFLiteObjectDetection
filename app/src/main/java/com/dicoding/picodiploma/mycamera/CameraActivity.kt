@@ -48,11 +48,17 @@ class CameraActivity : AppCompatActivity() {
                     }
                 }
 
-                override fun onResults(results: MutableList<Detection>?, inferenceTime: Long) {
+                override fun onResults(
+                    results: MutableList<Detection>?,
+                    inferenceTime: Long,
+                    imageHeight: Int,
+                    imageWidth: Int
+                ) {
                     runOnUiThread {
                         results?.let { data ->
                             if (data.isNotEmpty() && data[0].categories.isNotEmpty()) {
                                 println(data)
+                                binding.overlay.setResults(results, imageHeight, imageWidth)
 
                                 val builder = StringBuilder()
                                 for (result in results) {
@@ -66,10 +72,13 @@ class CameraActivity : AppCompatActivity() {
                                 binding.tvResult.visibility = View.VISIBLE
                                 binding.tvInferenceTime.text = "$inferenceTime ms"
                             } else {
+                                binding.overlay.clear()
                                 binding.tvResult.text = ""
                                 binding.tvInferenceTime.text = ""
                             }
                         }
+                        // force a redraw
+                        binding.overlay.invalidate()
                     }
                 }
             }

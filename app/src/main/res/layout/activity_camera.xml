@@ -11,6 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <com.dicoding.picodiploma.mycamera.OverlayView
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
         android:id="@+id/tvResult"
         android:layout_width="match_parent"
@@ -21,6 +26,7 @@
         android:padding="16dp"
         android:textColor="@color/black"
         android:textSize="20sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

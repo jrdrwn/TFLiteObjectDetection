@@ -1,10 +1,10 @@
 package com.dicoding.picodiploma.mycamera
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import com.google.android.gms.tflite.client.TfLiteInitializationOptions
 import com.google.android.gms.tflite.gpu.support.TfLiteGpu
@@ -30,7 +30,9 @@ class ObjectDetectorHelper(
         fun onError(error: String)
         fun onResults(
             results: MutableList<Detection>?,
-            inferenceTime: Long
+            inferenceTime: Long,
+            imageHeight: Int,
+            imageWidth: Int
         )
     }
 
@@ -74,6 +76,7 @@ class ObjectDetectorHelper(
         }
     }
 
+    @ExperimentalGetImage
     fun detectObject(image: ImageProxy) {
         if (!TfLiteVision.isInitialized()) {
             val errorMessage = context.getString(R.string.tflitevision_is_not_initialized_yet)
@@ -88,27 +91,21 @@ class ObjectDetectorHelper(
         val imageProcessor = ImageProcessor.Builder()
             .add(Rot90Op(-image.imageInfo.rotationDegrees / 90))
             .build()
-        val tensorImage = imageProcessor.process(TensorImage.fromBitmap(toBitmap(image)))
+
+        val tensorImage = imageProcessor.process(TensorImage.fromBitmap(image.toBitmap()))
+        image.close()
 
         var inferenceTime = SystemClock.uptimeMillis()
         val results = objectDetector?.detect(tensorImage)
         inferenceTime = SystemClock.uptimeMillis() - inferenceTime
         detectorListener?.onResults(
             results,
-            inferenceTime
+            inferenceTime,
+            tensorImage.height,
+            tensorImage.width
         )
     }
 
-    private fun toBitmap(image: ImageProxy): Bitmap {
-        val bitmapBuffer = Bitmap.createBitmap(
-            image.width,
-            image.height,
-            Bitmap.Config.ARGB_8888
-        )
-        image.use { bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer) }
-        image.close()
-        return bitmapBuffer
-    }
 
     companion object {
         private const val TAG = "ObjectDetectorHelper"
