@@ -3,7 +3,6 @@ package com.dicoding.picodiploma.mycamera
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
@@ -17,7 +16,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.dicoding.picodiploma.mycamera.databinding.ActivityCameraBinding
 import org.tensorflow.lite.task.gms.vision.detector.Detection
-import java.text.NumberFormat
 import java.util.concurrent.Executors
 
 class CameraActivity : AppCompatActivity() {
@@ -55,25 +53,14 @@ class CameraActivity : AppCompatActivity() {
                     imageWidth: Int
                 ) {
                     runOnUiThread {
-                        results?.let { data ->
-                            if (data.isNotEmpty() && data[0].categories.isNotEmpty()) {
-                                println(data)
+                        results?.let {
+                            if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
+                                println(it)
                                 binding.overlay.setResults(results, imageHeight, imageWidth)
 
-                                val builder = StringBuilder()
-                                for (result in results) {
-                                    val displayResult =
-                                        "${result.categories[0].label} " + NumberFormat.getPercentInstance()
-                                            .format(result.categories[0].score).trim()
-                                    builder.append("$displayResult \n")
-                                }
-
-                                binding.tvResult.text = builder.toString()
-                                binding.tvResult.visibility = View.VISIBLE
                                 binding.tvInferenceTime.text = "$inferenceTime ms"
                             } else {
                                 binding.overlay.clear()
-                                binding.tvResult.text = ""
                                 binding.tvInferenceTime.text = ""
                             }
                         }
