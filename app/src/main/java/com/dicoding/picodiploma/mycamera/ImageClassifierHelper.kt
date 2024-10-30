@@ -29,7 +29,7 @@ class ImageClassifierHelper(
         fun onError(error: String)
         fun onResults(
             results: List<Classifications>?,
-            interenceTime: Long
+            inferenceTime: Long
         )
     }
 
